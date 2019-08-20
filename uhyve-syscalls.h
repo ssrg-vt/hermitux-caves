@@ -59,4 +59,12 @@ typedef struct {
 	int success;
 } __attribute__ ((packed)) uhyve_pfault_t;
 
+typedef struct {
+	int dirfd;
+	const char* name;
+	int flags;
+	int mode;
+	int ret;
+} __attribute__((packed)) uhyve_openat_t;
+
 #endif // UHYVE_SYSCALLS_H

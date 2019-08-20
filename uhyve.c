@@ -466,6 +466,14 @@ static int vcpu_loop(void)
 					break;
 				}
 
+            case UHYVE_PORT_OPENAT: {
+                uhyve_openat_t* arg = (uhyve_openat_t*) (guest_mem+raddr);
+
+                arg->ret = openat(arg->dirfd, guest_mem+(size_t)arg->name,
+                        arg->flags, arg->mode);
+                break;
+            }
+
 			case UHYVE_PORT_CMDSIZE: {
 					int i;
 					uhyve_cmdsize_t *val = (uhyve_cmdsize_t *) (guest_mem+raddr);
@@ -777,6 +785,7 @@ int uhyve_init(char **argv)
 		if (hermit_tux)
 			if (uhyve_elf_loader(htux_bin) < 0)
 				exit(EXIT_FAILURE);
+    }
 #endif
 
 	pthread_barrier_init(&barrier, NULL, ncores);

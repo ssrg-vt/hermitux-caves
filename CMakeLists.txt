@@ -4,6 +4,8 @@ project(hermit_tools C)
 include(CheckIncludeFiles)
 include(../cmake/HermitCore-Paths.cmake)
 
+SET(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+
 option(ENABLE_RDMA_MIGRATION "Migration support via RDMA" OFF)
 
 
