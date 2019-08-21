@@ -62,6 +62,7 @@
 #include <sys/eventfd.h>
 #include <linux/const.h>
 #include <linux/kvm.h>
+#include <sys/syscall.h>
 
 #include "uhyve.h"
 #include "uhyve-syscalls.h"
@@ -469,10 +470,71 @@ static int vcpu_loop(void)
             case UHYVE_PORT_OPENAT: {
                 uhyve_openat_t* arg = (uhyve_openat_t*) (guest_mem+raddr);
 
-                arg->ret = openat(arg->dirfd, guest_mem+(size_t)arg->name,
+                int ret = openat(arg->dirfd, guest_mem+(size_t)arg->name,
                         arg->flags, arg->mode);
+
+                arg->ret = (ret == -1) ? -errno : ret;
                 break;
             }
+
+            case UHYVE_PORT_READLINKAT: {
+                uhyve_readlinkat_t *arg =
+                    (uhyve_readlinkat_t *) (guest_mem+raddr);
+
+                /* many programs access the application binary not through
+				 * argv[0] but through /proc/self/exec, for us it is actually
+				 * proxy so we need to correct that */
+				if(!strcmp(guest_mem+(size_t)arg->path, "/proc/self/exe")) {
+					char abspath[256];
+					realpath(htux_bin, abspath);
+
+					if(arg->bufsz > strlen(abspath)) {
+						strcpy(guest_mem+(size_t)arg->buf, abspath);
+						arg->ret = strlen(abspath);
+					}
+					else
+						arg->ret = -1;
+					break;
+
+				}
+
+                int ret = readlinkat(arg->dirfd, guest_mem+(size_t)arg->path,
+                        guest_mem+(size_t)arg->buf, arg->bufsz);
+
+                arg->ret = (ret == -1) ? -errno : ret;
+                break;
+            }
+
+            case UHYVE_PORT_FSTAT: {
+                uhyve_fstat_t *arg = (uhyve_fstat_t *) (guest_mem+raddr);
+
+                int ret = fstat(arg->fd,
+                        (struct stat *)(guest_mem+(size_t)arg->st));
+
+				arg->ret = (ret == -1) ? -errno : ret;
+                break;
+
+            }
+
+        case UHYVE_PORT_FACCESSAT: {
+            uhyve_faccessat_t *arg = (uhyve_faccessat_t *) (guest_mem + raddr);
+
+            arg->ret = faccessat(arg->dirfd, guest_mem+(size_t)arg->pathname,
+                    arg->mode, arg->flags);
+
+            break;
+        }
+
+        case UHYVE_PORT_NEWFSTATAT: {
+            uhyve_newfstatat_t *arg = (uhyve_newfstatat_t *) (guest_mem +
+                    raddr);
+
+            arg->ret = syscall(SYS_newfstatat, arg->dirfd,
+                    guest_mem+(size_t)arg->filename,
+                    guest_mem+(size_t)arg->buf, arg->flag);
+
+            break;
+        }
 
 			case UHYVE_PORT_CMDSIZE: {
 					int i;

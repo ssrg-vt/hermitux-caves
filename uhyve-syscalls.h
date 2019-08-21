@@ -67,4 +67,34 @@ typedef struct {
 	int ret;
 } __attribute__((packed)) uhyve_openat_t;
 
+typedef struct {
+    int dirfd;
+	char *path;
+	char* buf;
+	int bufsz;
+	ssize_t ret;
+} __attribute__((packed)) uhyve_readlinkat_t;
+
+typedef struct {
+	int fd;
+	int ret;
+	struct stat *st;
+} __attribute__ ((packed)) uhyve_fstat_t;
+
+typedef struct {
+    int dirfd;
+	const char *pathname;
+	int mode;
+	int ret;
+    int flags;
+} __attribute__((packed)) uhyve_faccessat_t;
+
+typedef struct {
+	int dirfd;
+	char *filename;
+	struct stat *buf;
+    int flag;
+    int ret;
+} __attribute__ ((packed)) uhyve_newfstatat_t;
+
 #endif // UHYVE_SYSCALLS_H
