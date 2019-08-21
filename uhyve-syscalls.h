@@ -97,4 +97,10 @@ typedef struct {
     int ret;
 } __attribute__ ((packed)) uhyve_newfstatat_t;
 
+typedef struct {
+	char *buf;
+	size_t size;
+	int ret;
+} __attribute__ ((packed)) uhyve_getcwd_t;
+
 #endif // UHYVE_SYSCALLS_H

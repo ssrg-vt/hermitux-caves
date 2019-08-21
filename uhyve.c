@@ -236,7 +236,6 @@ static void* wait_for_packet(void* arg)
 	while(1)
 	{
 		fds.revents = 0;
-
 		ret = poll(&fds, 1, -1000);
 
 		if (ret < 0 && errno == EINTR)
@@ -533,6 +532,13 @@ static int vcpu_loop(void)
                     guest_mem+(size_t)arg->filename,
                     guest_mem+(size_t)arg->buf, arg->flag);
 
+            break;
+        }
+
+        case UHYVE_PORT_GETCWD: {
+            uhyve_getcwd_t *arg = (uhyve_getcwd_t *) (guest_mem+raddr);
+
+            getcwd((char *)(guest_mem+(size_t)arg->buf), arg->size);
             break;
         }
 
