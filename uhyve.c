@@ -515,6 +515,28 @@ static int vcpu_loop(void)
 
             }
 
+            case UHYVE_PORT_MKDIRAT: {
+                uhyve_mkdirat_t *arg = (uhyve_mkdirat_t *) (guest_mem+raddr);
+
+                int ret = mkdirat(arg->dirfd,
+                        (char *)(guest_mem+(size_t)arg->pathname),
+                        arg->mode);
+
+                break;
+
+            }
+
+            case UHYVE_PORT_UNLINKAT: {
+                uhyve_unlinkat_t *arg = (uhyve_unlinkat_t *) (guest_mem+raddr);
+
+                int ret = unlinkat(arg->dirfd,
+                        (char *)(guest_mem+(size_t)arg->pathname),
+                        arg->flags);
+
+                break;
+
+            }
+
         case UHYVE_PORT_FACCESSAT: {
             uhyve_faccessat_t *arg = (uhyve_faccessat_t *) (guest_mem + raddr);
 

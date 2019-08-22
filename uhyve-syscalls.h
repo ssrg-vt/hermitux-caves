@@ -103,4 +103,19 @@ typedef struct {
 	int ret;
 } __attribute__ ((packed)) uhyve_getcwd_t;
 
+typedef unsigned short umode_t;
+typedef struct {
+    int dirfd;
+	const char *pathname;
+	umode_t mode;
+	int ret;
+} __attribute__ ((packed)) uhyve_mkdirat_t;
+
+typedef struct {
+    int dirfd;
+	const char* pathname;
+    int flags;
+	int ret;
+} __attribute__((packed)) uhyve_unlinkat_t;
+
 #endif // UHYVE_SYSCALLS_H
