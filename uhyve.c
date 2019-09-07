@@ -564,6 +564,78 @@ static int vcpu_loop(void)
             break;
         }
 
+			/* When using minifs, we can load some files from the host, in that
+			 * case the env. varian;e HERMIT_MINIFS_HOSTLOAD must be set with
+			 * a path to a 'listing' file that has one line per file to laod
+			 * from the host into the guest minifs, with the following format:
+			 * <source file on the host>;<target path on the guest> */
+			case UHYVE_PORT_MINIFS_LOAD: {
+				unsigned data = *((unsigned*)((size_t)run+run->io.data_offset));
+				uhyve_minifs_load_t *arg = (uhyve_minifs_load_t *)(guest_mem + data);
+				static FILE *minifs_fp = NULL;
+				size_t len, bytes_read = 0;
+				char *line = NULL;
+				char *filename = getenv("HERMIT_MINIFS_HOSTLOAD");
+
+				if(!minifs_fp) {
+					if(filename)
+						minifs_fp = fopen(filename, "r");
+
+					if(!minifs_fp) {
+						/* Could not open the listing ile, or no listing file
+						 * provided, we indicate to the guest that we're done */
+						arg->hostpath[0] = arg->guestpath[0] = '\0';
+						break;
+					}
+				}
+
+				/* Comments in this file are lines starting with '#' */
+				do
+					bytes_read = getline(&line, &len, minifs_fp);
+				while (line[0] == '#' && bytes_read != -1);
+
+				if(bytes_read == -1) {
+					/* End of file, we are done */
+					arg->hostpath[0] = arg->guestpath[0] = '\0';
+					fclose(minifs_fp);
+					break;
+				} else {
+					int guestpath_offset, i = 0;
+
+					/* Set the host path */
+					while(line[i] != ';') {
+						if(i >= MINIFS_LOAD_MAXPATH) {
+							fprintf(stderr, "minifs load from %s: % too long\n",
+									filename, "hostpath");
+							arg->hostpath[0] = arg->guestpath[0] = '\0';
+							break;
+						}
+
+						arg->hostpath[i] = line[i];
+						i++;
+					}
+
+					/* Set the guest path */
+					arg->hostpath[i++] = '\0';
+					guestpath_offset = i;
+					while(line[i] != '\n') {
+						if((i-guestpath_offset) >= MINIFS_LOAD_MAXPATH) {
+							fprintf(stderr, "minifs load from %s: % too long\n",
+									filename, "hostpath");
+							arg->hostpath[0] = arg->guestpath[0] = '\0';
+							break;
+						}
+
+						arg->guestpath[i-guestpath_offset] = line[i];
+						i++;
+					}
+					arg->guestpath[i-guestpath_offset] = '\0';
+				}
+
+				break;
+			}
+
+
 			case UHYVE_PORT_CMDSIZE: {
 					int i;
 					uhyve_cmdsize_t *val = (uhyve_cmdsize_t *) (guest_mem+raddr);
@@ -1013,6 +1085,12 @@ int uhyve_loop(int argc, char **argv)
 	*((uint64_t*) (mboot + 0x238)) = tux_ehdr_phoff;
 	*((uint64_t*) (mboot + 0x240)) = tux_ehdr_phnum;
 	*((uint64_t*) (mboot + 0x248)) = tux_ehdr_phentsize;
+
+    char *str = getenv("HERMIT_MINIFS");
+    if(str && strcmp(str, "0")) {
+        *((uint64_t*) (mboot + 0x228)) = 1;
+    }
+
 #endif
 
 	if (ts > 0)

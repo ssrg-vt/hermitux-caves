@@ -118,4 +118,11 @@ typedef struct {
 	int ret;
 } __attribute__((packed)) uhyve_unlinkat_t;
 
+/* Warning: this needs to be consistent with what is in kernel/minifs.c! */
+#define MINIFS_LOAD_MAXPATH		128
+typedef struct {
+	char hostpath[MINIFS_LOAD_MAXPATH];
+	char guestpath[MINIFS_LOAD_MAXPATH];
+} __attribute__((packed)) uhyve_minifs_load_t;
+
 #endif // UHYVE_SYSCALLS_H
