@@ -570,8 +570,7 @@ static int vcpu_loop(void)
 			 * from the host into the guest minifs, with the following format:
 			 * <source file on the host>;<target path on the guest> */
 			case UHYVE_PORT_MINIFS_LOAD: {
-				unsigned data = *((unsigned*)((size_t)run+run->io.data_offset));
-				uhyve_minifs_load_t *arg = (uhyve_minifs_load_t *)(guest_mem + data);
+				uhyve_minifs_load_t *arg = (uhyve_minifs_load_t *)(guest_mem + raddr);
 				static FILE *minifs_fp = NULL;
 				size_t len, bytes_read = 0;
 				char *line = NULL;
