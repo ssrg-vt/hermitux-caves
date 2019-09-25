@@ -597,10 +597,10 @@ int load_kernel(uint8_t* mem, char* path)
 				uint32_t ip[4];
 
 				sscanf(str, "%u.%u.%u.%u",	ip+0, ip+1, ip+2, ip+3);
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB0)) = (uint8_t) ip[0];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB1)) = (uint8_t) ip[1];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB2)) = (uint8_t) ip[2];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB3)) = (uint8_t) ip[3];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x160)) = (uint8_t) ip[0];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x161)) = (uint8_t) ip[1];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x162)) = (uint8_t) ip[2];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x163)) = (uint8_t) ip[3];
 			}
 
 			str = getenv("HERMIT_GATEWAY");
@@ -608,20 +608,20 @@ int load_kernel(uint8_t* mem, char* path)
 				uint32_t ip[4];
 
 				sscanf(str, "%u.%u.%u.%u",	ip+0, ip+1, ip+2, ip+3);
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB4)) = (uint8_t) ip[0];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB5)) = (uint8_t) ip[1];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB6)) = (uint8_t) ip[2];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB7)) = (uint8_t) ip[3];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x164)) = (uint8_t) ip[0];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x165)) = (uint8_t) ip[1];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x166)) = (uint8_t) ip[2];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x167)) = (uint8_t) ip[3];
 			}
 			str = getenv("HERMIT_MASK");
 			if (str) {
 				uint32_t ip[4];
 
 				sscanf(str, "%u.%u.%u.%u",	ip+0, ip+1, ip+2, ip+3);
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB8)) = (uint8_t) ip[0];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xB9)) = (uint8_t) ip[1];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xBA)) = (uint8_t) ip[2];
-				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0xBB)) = (uint8_t) ip[3];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x168)) = (uint8_t) ip[0];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x169)) = (uint8_t) ip[1];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x170)) = (uint8_t) ip[2];
+				*((uint8_t*) (mem+paddr-GUEST_OFFSET + 0x171)) = (uint8_t) ip[3];
 			}
 
 			*((uint64_t*) (mem+paddr-GUEST_OFFSET + 0xbc)) = (uint64_t) guest_mem;
