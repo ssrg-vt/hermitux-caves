@@ -557,6 +557,24 @@ static int vcpu_loop(void)
             break;
         }
 
+        case UHYVE_PORT_FCNTL: {
+            uhyve_fcntl_t *arg = (uhyve_fcntl_t *) (guest_mem +
+                    raddr);
+
+            arg->ret = fcntl(arg->fd, arg->cmd, arg->arg);
+            break;
+        }
+
+        case UHYVE_PORT_GETDENTS64: {
+            uhyve_getdeents64_t *arg = (uhyve_getdeents64_t*) (guest_mem +
+                    raddr);
+
+            arg->ret = syscall(SYS_getdents64, arg->fd,
+                    guest_mem+(size_t)arg->dirp, arg->count);
+
+            break;
+        }
+
         case UHYVE_PORT_GETCWD: {
             uhyve_getcwd_t *arg = (uhyve_getcwd_t *) (guest_mem+raddr);
 

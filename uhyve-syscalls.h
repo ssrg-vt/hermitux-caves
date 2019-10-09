@@ -125,4 +125,18 @@ typedef struct {
 	char guestpath[MINIFS_LOAD_MAXPATH];
 } __attribute__((packed)) uhyve_minifs_load_t;
 
+typedef struct {
+	int fd;
+	unsigned int cmd;
+	unsigned long arg;
+	int ret;
+} __attribute__((packed)) uhyve_fcntl_t;
+
+typedef struct {
+	int fd;
+	struct linux_dirent64 *dirp;
+	unsigned int count;
+	int ret;
+} __attribute__((packed)) uhyve_getdeents64_t;
+
 #endif // UHYVE_SYSCALLS_H
